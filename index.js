@@ -1,28 +1,43 @@
 const contacts = require('./contacts');
-// const argv = require("yargs").argv;
+const { Command } = require("commander");
+
+const program = new Command();
+program
+  .option("-a, --action <type>", "choose action")
+  .option("-i, --id <type>", "user id")
+  .option("-n, --name <type>", "user name")
+  .option("-e, --email <type>", "user email")
+  .option("-p, --phone <type>", "user phone");
+
+program.parse();
+
+const options = program.opts();
 
 const invokeAction = async ({action, id, name, email, phone}) => {
   switch(action) {
-    case "read":
-      const allContacts = await contacts.listContacts();
-        return console.log(allContacts);
-    case "getById":
-        const contactId = await contacts.getContactById();
+    case "list":
+        const allContacts = await contacts.listContacts();
+        return console.table(allContacts);
+        break;
+      
+    case "get":
+        const contactId = await contacts.getContactById(id);
         return console.log(contactId);
-    case "addId":
+        break;
+      
+    case "add":
         const newId = await contacts.addContact({name, email, phone});
         return console.log(newId);
-    case "updateContact":
-        const updateId = await contacts.removeContact(id, {name, email, phone});
-        return console.log(updateId);
-    case "removeContact":
+        break;
+            
+    case "remove": 
         const removeId = await contacts.removeContact(id);
         return console.log(removeId);
+        break;
+      
+    default:
+        console.warn("\x1B[31m Unknown action type!");
     };
 }
 
-// invokeAction({action: "read"});
-// invokeAction({action: "getById"});
-// invokeAction({action: "addId", name: "Olesya", email: "olesya85@gmail.com", phone: "0966446191"});
-// invokeAction({action: "updateContact", id: "AeHIrLTr6JkxGE6SN-0Rw", name: "Olesya", email: "olesya85@i.ua", phone: "0664040922"});
-// invokeAction({ action: "removeContact", id: "AeHIrLTr6JkxGE6SN-0Rw"});
+invokeAction(options);
